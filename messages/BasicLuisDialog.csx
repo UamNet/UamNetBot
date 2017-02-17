@@ -4,6 +4,8 @@ using System;
 using System.Threading.Tasks;
 using System.Net.Http;
 
+using System.Linq;
+
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
@@ -83,16 +85,21 @@ public class BasicLuisDialog : LuisDialog<object>
         EntityRecommendation entityName;
         if (result.TryFindEntity("Nombre", out entityName))
         {
-            await context.PostAsync(entityName.Entity);
+            await sendEvents(context, (from ev in events where ev.day != null && ev.title.Contains(entityName) select ev));
         }
         else
         {
-            foreach (Event e in events)
-            {
-                await context.PostAsync(e.ToString());
-            }
+            await sendEvents(context, (from ev in events where ev.day != null select ev));
         }
         context.Wait(MessageReceived);
+    }
+
+    async void sendEvents(IDialogContext context, List<Event> events)
+    {
+        foreach (Event e in events)
+        {
+            await context.PostAsync(e.ToString());
+        }
     }
 
     public class Event
@@ -108,7 +115,7 @@ public class BasicLuisDialog : LuisDialog<object>
         public string id { get; set; }
         public String ToString()
         {
-            return $"'${title}' by ${by} at ${place}, ${day}-${month}-${year} at ${time}";
+            return $"'{title}' by {by} at {place}, {day}-{month}-{year} at {time}";
         }
     }
 }
