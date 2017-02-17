@@ -1,10 +1,15 @@
+#r "Newtonsoft.Json"
+
 using System;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
+
+using Newtonsoft.Json;
 
 
 // For more information about this template visit http://aka.ms/azurebots-csharp-luis
@@ -56,7 +61,7 @@ public class BasicLuisDialog : LuisDialog<object>
         await context.PostAsync("We have a Telegram group to talk about stuff!");
         await context.PostAsync("[Click here to join](https://t.me/joinchat/AAAAAD67JwNoT7jDq_xfZg)");
         context.Wait(MessageReceived);
-    } 
+    }
     [LuisIntent("Join Dreamspark")]
     public async Task JoinDreamspark(IDialogContext context, LuisResult result)
     {
@@ -68,13 +73,39 @@ public class BasicLuisDialog : LuisDialog<object>
     [LuisIntent("Encontrar eventos")]
     public async Task FindEvents(IDialogContext context, LuisResult result)
     {
-        await context.PostAsync("wip");
+        await context.PostAsync("Let's see what we have...");
+        //Call the API from the web to retrieve the events
+        var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync("http://uamnet.azurewebsites.net/api/events");
+        response.EnsureSuccessStatusCode();
+        string content = await response.Content.ReadAsStringAsync();
+        List<Event> events = JsonConvert.DeserializeObject<List<Event>>(jsonContent);
         EntityRecommendation entityName;
-        if(result.TryFindEntity("Nombre", out entityName)){
+        if (result.TryFindEntity("Nombre", out entityName))
+        {
             await context.PostAsync(entityName.Entity);
-        }else{
-            await context.PostAsync(" no name");
+        }
+        else
+        {
+            events.forEach(x=> context.PostAsync(x.toString()));
         }
         context.Wait(MessageReceived);
+    }
+
+    public class Event
+    {
+        public string title { get; set; }
+        public string by { get; set; }
+        public string place { get; set; }
+        public string day { get; set; }
+        public string month { get; set; }
+        public string year { get; set; }
+        public string time { get; set; }
+        public string color { get; set; }
+        public string id { get; set; }
+        public String toString()
+        {
+            return $"'${title}' by ${by} at ${place}, ${day}-${month}-${year} at ${time}";
+        }
     }
 }
