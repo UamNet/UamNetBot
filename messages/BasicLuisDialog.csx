@@ -96,9 +96,15 @@ public class BasicLuisDialog : LuisDialog<object>
 
     async Task sendEvents(IDialogContext context, IEnumerable<Event> events)
     {
+        Boolean empty = true;
         foreach (Event e in events)
         {
             await context.PostAsync(e.ToString());
+            empty = false;
+        }
+        if (empty)
+        {
+            await context.PostAsync("I can't find anything!");
         }
     }
 
