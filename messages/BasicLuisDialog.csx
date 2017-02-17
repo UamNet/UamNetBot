@@ -85,7 +85,7 @@ public class BasicLuisDialog : LuisDialog<object>
         EntityRecommendation entityName;
         if (result.TryFindEntity("Nombre", out entityName))
         {
-            await sendEvents(context, (from ev in events where ev.day != null && ev.title.Contains(entityName) select ev));
+            await sendEvents(context, (from ev in events where ev.day != null && ev.title.Contains(entityName.Entity) select ev));
         }
         else
         {
@@ -94,7 +94,7 @@ public class BasicLuisDialog : LuisDialog<object>
         context.Wait(MessageReceived);
     }
 
-    async void sendEvents(IDialogContext context, List<Event> events)
+    async void sendEvents(IDialogContext context, IEnumerable<Event> events)
     {
         foreach (Event e in events)
         {
@@ -113,7 +113,7 @@ public class BasicLuisDialog : LuisDialog<object>
         public string time { get; set; }
         public string color { get; set; }
         public string id { get; set; }
-        public String ToString()
+        override public String ToString()
         {
             return $"'{title}' by {by} at {place}, {day}-{month}-{year} at {time}";
         }
