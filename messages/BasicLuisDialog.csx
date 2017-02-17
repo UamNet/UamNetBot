@@ -87,7 +87,10 @@ public class BasicLuisDialog : LuisDialog<object>
         }
         else
         {
-            events.forEach(x=> context.PostAsync(x.toString()));
+            foreach (Event e in events)
+            {
+                await context.PostAsync(e.ToString());
+            }
         }
         context.Wait(MessageReceived);
     }
@@ -103,7 +106,7 @@ public class BasicLuisDialog : LuisDialog<object>
         public string time { get; set; }
         public string color { get; set; }
         public string id { get; set; }
-        public String toString()
+        public String ToString()
         {
             return $"'${title}' by ${by} at ${place}, ${day}-${month}-${year} at ${time}";
         }
