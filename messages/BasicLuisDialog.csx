@@ -86,12 +86,12 @@ public class BasicLuisDialog : LuisDialog<object>
         if (result.TryFindEntity("Nombre", out entityName))
         {
             await context.PostAsync($"These are all the events about {entityName.Entity}:");
-            await sendEvents(context, (from ev in events where ev.day != "" && ev.title.ToLower().Contains(entityName.Entity.ToLower()) select ev));
+            await sendEvents(context, (from ev in events where ev.day.Length > 0 && ev.title.ToLower().Contains(entityName.Entity.ToLower()) select ev));
         }
         else
         {
             await context.PostAsync("These are all the events:");
-            await sendEvents(context, (from ev in events where ev.day != "" select ev));
+            await sendEvents(context, (from ev in events where ev.day.Length > 0 select ev));
         }
         context.Wait(MessageReceived);
     }
@@ -123,7 +123,7 @@ public class BasicLuisDialog : LuisDialog<object>
         public string id { get; set; }
         override public String ToString()
         {
-            return $"'{title}' by {by} at {place}, {day}-{month}-{year} at {time}";
+            return $"'{title}' by {by} at {place}, {day}/{month}/{year} at {time}";
         }
     }
 }
