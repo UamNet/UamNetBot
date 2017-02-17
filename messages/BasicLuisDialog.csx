@@ -79,7 +79,7 @@ public class BasicLuisDialog : LuisDialog<object>
         var response = await httpClient.GetAsync("http://uamnet.azurewebsites.net/api/events");
         response.EnsureSuccessStatusCode();
         string content = await response.Content.ReadAsStringAsync();
-        List<Event> events = JsonConvert.DeserializeObject<List<Event>>(jsonContent);
+        List<Event> events = JsonConvert.DeserializeObject<List<Event>>(content);
         EntityRecommendation entityName;
         if (result.TryFindEntity("Nombre", out entityName))
         {
