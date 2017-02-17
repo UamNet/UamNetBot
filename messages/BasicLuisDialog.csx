@@ -128,7 +128,7 @@ public class BasicLuisDialog : LuisDialog<object>
         public string time { get; set; }
         public string color { get; set; }
         public string id { get; set; }
-        public DateTime getDate() { return new DateTime(year, Array.IndexOf(months,month)+1, day);}
+        public DateTime getDate() { return new DateTime( Int32.Parse(year), Array.IndexOf(months,month)+1, Int32.Parse(day));}
         override public String ToString()
         {
             return $"'{title}' by {by} at {place}, {day}/{month}/{year} at {time}";
