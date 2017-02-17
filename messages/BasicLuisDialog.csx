@@ -94,7 +94,7 @@ public class BasicLuisDialog : LuisDialog<object>
         context.Wait(MessageReceived);
     }
 
-    async void sendEvents(IDialogContext context, IEnumerable<Event> events)
+    async Task sendEvents(IDialogContext context, IEnumerable<Event> events)
     {
         foreach (Event e in events)
         {
