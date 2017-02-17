@@ -85,11 +85,11 @@ public class BasicLuisDialog : LuisDialog<object>
         EntityRecommendation entityName;
         if (result.TryFindEntity("Nombre", out entityName))
         {
-            await sendEvents(context, (from ev in events where ev.day != null && ev.title.Contains(entityName.Entity) select ev));
+            await sendEvents(context, (from ev in events where ev.day != "" && ev.title.ToLower().Contains(entityName.Entity.ToLower()) select ev));
         }
         else
         {
-            await sendEvents(context, (from ev in events where ev.day != null select ev));
+            await sendEvents(context, (from ev in events where ev.day != "" select ev));
         }
         context.Wait(MessageReceived);
     }
