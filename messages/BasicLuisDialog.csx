@@ -88,13 +88,20 @@ public class BasicLuisDialog : LuisDialog<object>
             await context.PostAsync($"These are all the events about {entityName.Entity}:");
             await sendEvents(context, (from ev in events where ev.day.Length > 0 && ev.title.ToLower().Contains(entityName.Entity.ToLower()) select ev));
         }
+        else if (result.TryFindEntity("Lugar", out entityName))
+        {
+            await context.PostAsync($"These are all the events at {entityName.Entity}:");
+            await sendEvents(context, (from ev in events where ev.day.Length > 0 && ev.place.ToLower().Contains(entityName.Entity.ToLower()) select ev));
+        }
         else
         {
             await context.PostAsync("These are all the events:");
-            await sendEvents(context, (from ev in events where ev.day.Length > 0 select ev));
+            await sendEvents(context, (from ev in events where ev.day.Length > 0 && DateTime.Compare(ev.getDate(), DateTime.Now)>=0 select ev));
         }
         context.Wait(MessageReceived);
     }
+
+    static string[] months ={"Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"};
 
     async Task sendEvents(IDialogContext context, IEnumerable<Event> events)
     {
@@ -115,12 +122,13 @@ public class BasicLuisDialog : LuisDialog<object>
         public string title { get; set; }
         public string by { get; set; }
         public string place { get; set; }
-        public string day { get; set; }
+        public string day { get; set; } 
         public string month { get; set; }
         public string year { get; set; }
         public string time { get; set; }
         public string color { get; set; }
         public string id { get; set; }
+        public DateTime getDate() { return new DateTime(year, Array.IndexOf(months,month)+1, day);}
         override public String ToString()
         {
             return $"'{title}' by {by} at {place}, {day}/{month}/{year} at {time}";
